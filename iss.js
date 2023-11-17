@@ -21,7 +21,8 @@ const fetchMyIP = function(callback) {
     }
 
     if (response && response.statusCode !== 200) {
-      callback(`Status Code ${response.StatusCode} during IP fetch request. Response: ${body}`, null);
+      const msg = (`An error occured while retriving your IP address.`)
+      callback(`Status Code ${response.StatusCode}. Response: ${body}`, null);
       callback(Error(msg), null);
       return;
     }
@@ -33,19 +34,28 @@ const fetchMyIP = function(callback) {
 
 const fetchCoordsByIP = function(ip,callback) {
 
-  request('https://ipwho.is/24.108.192.127', (error, response, body) => {
+  request(`https://ipwho.is/${ip}`, (error, response, body) => {
+    //is this the correct way to access the IP? forgot to use backticks to interpolate the IP address from the request url.
     if (error) {
       callback(error, null);
       return
     }
 
     if (response && response.statusCode !== 200) {
-      callback(`Status Code: ${response.StatusCode} during Geo-location fetch request. Response: ${body}`, null);
+      const msg = (`An error while retrieving your Geo-location.`)
+      callback(`Status Code: ${response.StatusCode}. Response: ${body}`, null);
       callback(Error(msg), null);
       return;
     }
-    const ipwhois = JSON.parse(body);
-    callback(null, ipwhois.io);
+    const latitude = JSON.parse(body).data.latitude;
+    const longitude = JSON.parse(body).data.longitude;
+   
+    const coordinates = {
+      latitude: latitude,
+      longitude: longitude
+    }
+    callback(null, coordinates);
+    //callback(null, ipwhois.io);
   });
 };
 
