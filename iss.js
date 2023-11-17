@@ -2,16 +2,7 @@
 
 const request = require('request');
 
-//make the API request with req library
-
 const fetchMyIP = function(callback) {
-  // const options = {
-  //   url: 'https://api.ipify.org?format=json',
-
-  //   headers: {
-  //     'User-Agent': 'Iss Spotter'
-  //   }
-  // };
 
   request('https://api.ipify.org?format=json', (error, response, body) => {
     //err
@@ -21,7 +12,7 @@ const fetchMyIP = function(callback) {
     }
 
     if (response && response.statusCode !== 200) {
-      const msg = (`An error occured while retriving your IP address.`)
+      const msg = (`An error occured while retriving your IP address.`);
       callback(`Status Code ${response.StatusCode}. Response: ${body}`, null);
       callback(Error(msg), null);
       return;
@@ -32,38 +23,40 @@ const fetchMyIP = function(callback) {
   });
 };
 
-const fetchCoordsByIP = function(ip,callback) {
+const fetchCoordsByIP = function(ip, callback) {
 
   request(`https://ipwho.is/${ip}`, (error, response, body) => {
-    //is this the correct way to access the IP? forgot to use backticks to interpolate the IP address from the request url.
+    //is this the correct way to access the IP? forgot to use backticks tointerpolate the IP address from the request url.
     if (error) {
       callback(error, null);
-      console.log('line 41 before invoking callback');
-      return
+      return;
+    }
+
+    // parse the returned body so we can check its information
+    const parsedBody = JSON.parse(body);
+    // check if "success" is true or not
+    if (!parsedBody.success) {
+      const message = `Success status was ${parsedBody.success}. Server message says: ${parsedBody.message} when fetching for IP ${parsedBody.ip}`;
+      callback(Error(message), null);
+      return;
     }
 
     if (response && response.statusCode !== 200) {
-      console.log('line 46 before invoking callback');
-      const msg = (`An error while retrieving your Geo-location.`)
-      console.log('line 48 before invoking callback');
+      const msg = (`It didn't work!`);
       callback(`Status Code: ${response.StatusCode}. Response: ${body}`, null);
-      console.log('line 50 after invoking callback');
       callback(Error(msg), null);
       return;
     }
+
     const latitude = JSON.parse(body).latitude;
     const longitude = JSON.parse(body).longitude;
-   
+
     const coordinates = {
       latitude: latitude,
       longitude: longitude
-    }
+    };
     callback(null, coordinates);
   });
 };
-
-
-//Expected output: similar to this { latitude: '49.27670', longitude: '-123.13000' }
-// confirmation values stored in perosnal notes
 
 module.exports = { fetchMyIP, fetchCoordsByIP };
