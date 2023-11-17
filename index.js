@@ -1,4 +1,4 @@
-const fetchMyIP = require('./iss');
+const { fetchMyIP } = require('./iss.js');
 
 const callback = ((error, ip) => {
   //callback to handle errors for user and return the user ip
