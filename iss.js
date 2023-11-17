@@ -7,27 +7,35 @@ const request = require('request');
 const fetchMyIP = function(callback) {
   const options = {
     url: 'https://api.ipify.org?format=json',
-  
+
     headers: {
       'User-Agent': 'Iss Spotter'
     }
   };
 
-request(options,(error, response, body) => {
-  //err
-  if(error) {
-    callback (error, null);
-    return; 
-  }
- 
-  if (response && response.statusCode !== 200) {
-    callback(`Status Code ${response.StatusCode} during IP fetch request. Response: ${body}`, null);
-    return;
-  }
+  request(options, (error, response, body) => {
+    //err
+    if (error) {
+      callback(error, null);
+      return;
+    }
 
-      const ipify = JSON.parse(body);
-        callback (null, ipify.ip);
-});
+    if (response && response.statusCode !== 200) {
+      callback(`Status Code ${response.StatusCode} during IP fetch request. Response: ${body}`, null);
+      callback(Error(msg), null);
+      return;
+    }
+
+    const ipify = JSON.parse(body);
+    callback(null, ipify.ip);
+  });
+};
+
+const fetchCoordsByIP = () => {
+  //parameteres
+  //conditionals 
+  //args: IP sting and callback?
+
 }
 
-module.exports = { fetchMyIP };
+module.exports = { fetchMyIP, fetchCoordsByIP };
