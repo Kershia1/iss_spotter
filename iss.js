@@ -38,24 +38,27 @@ const fetchCoordsByIP = function(ip,callback) {
     //is this the correct way to access the IP? forgot to use backticks to interpolate the IP address from the request url.
     if (error) {
       callback(error, null);
+      console.log('line 41 before invoking callback');
       return
     }
 
     if (response && response.statusCode !== 200) {
+      console.log('line 46 before invoking callback');
       const msg = (`An error while retrieving your Geo-location.`)
+      console.log('line 48 before invoking callback');
       callback(`Status Code: ${response.StatusCode}. Response: ${body}`, null);
+      console.log('line 50 after invoking callback');
       callback(Error(msg), null);
       return;
     }
-    const latitude = JSON.parse(body).data.latitude;
-    const longitude = JSON.parse(body).data.longitude;
+    const latitude = JSON.parse(body).latitude;
+    const longitude = JSON.parse(body).longitude;
    
     const coordinates = {
       latitude: latitude,
       longitude: longitude
     }
     callback(null, coordinates);
-    //callback(null, ipwhois.io);
   });
 };
 
