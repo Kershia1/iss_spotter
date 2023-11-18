@@ -2,7 +2,7 @@
 
 const request = require('request');
 
-const fetchMyIP = function(callback) {
+const fetchMyIP = function (callback) {
 
   request('https://api.ipify.org?format=json', (error, response, body) => {
     //err
@@ -23,7 +23,7 @@ const fetchMyIP = function(callback) {
   });
 };
 
-const fetchcoordinatesByIP = function(ip, callback) {
+const fetchcoordinatesByIP = function (ip, callback) {
 
   request(`https://ipwho.is/${ip}`, (error, response, body) => {
     //is this the correct way to access the IP? forgot to use backticks tointerpolate the IP address from the request url.
@@ -51,11 +51,11 @@ const fetchcoordinatesByIP = function(ip, callback) {
     const latitude = JSON.parse(body).latitude;
     const longitude = JSON.parse(body).longitude;
 
-    const coordinates = {
+    const coords = {
       latitude: latitude,
       longitude: longitude
     };
-    callback(null, coordinates);
+    callback(null, coords);
   });
 };
 
@@ -69,9 +69,9 @@ const fetchcoordinatesByIP = function(ip, callback) {
  *   - The fly over times as an array of objects (null if error). Example:
  *     [ { risetime: 134564234, duration: 600 }, ... ]
  */
-const fetchISSFlyOverTimes = function(coordinates, callback) {
+const fetchISSFlyOverTimes = function (coords, callback) {
 
-  request(`https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}.`, (error, response, body) => {
+  request(`https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`, (error, response, body) => {
     if (error) {
       callback(error, null);
       return;
@@ -84,16 +84,51 @@ const fetchISSFlyOverTimes = function(coordinates, callback) {
       return;
     }
     try {
-const passes = JSON.parse(body).response;
-callback(null, passes);
+      const passes = JSON.parse(body).response;
+      callback(null, passes);
     } catch (parseError) {
-        callback(parseError, null);
+      callback(parseError, null);
     }
- });
+  });
 };
 
 //With all three API calls implemented, we can now glue or "chain" these together in order to build the app itself. We'll do that as the next thing.
 
+/**
+ * Orchestrates multiple API requests in order to determine the next 5 upcoming ISS fly overs for the user's current location.
+ * Input:
+ *   - A callback with an error or results. 
+ * Returns (via Callback):
+ *   - An error, if any (nullable)
+ *   - The fly-over times as an array (null if error):
+ *     [ { risetime: <number>, duration: <number> }, ... ]
+ */
+const nextISSTimesForMyLocation = function (callback) {
+  // timebox start 7:15 pm 
+  fetchMyIP((error, ip) => {
+    if(error) {
+      //console.log("IP function throwing Null: ", null);
+      return callback(error, null);
+    }
 
+    fetchcoordinatesByIP(ip, (error, coords) => {
+       if (error){
+        //console.log("byIP throwing Null: ", null);
+      return callback(error, null);
+       }
 
-module.exports = { fetchMyIP, fetchcoordinatesByIP, fetchISSFlyOverTimes  };
+       fetchISSFlyOverTimes(coords, (error, passes) => {
+        if(error) {
+          // console.log("ISS function throwing Null: ", null);
+          return callback(error, null);
+        }
+        callback(null, passes)
+       })
+    })
+  })
+};
+// nextISSTimesForMyLocation(callback);
+
+module.exports =  { nextISSTimesForMyLocation };
+
+//module.exports = { fetchMyIP, fetchcoordinatesByIP, fetchISSFlyOverTimes };
