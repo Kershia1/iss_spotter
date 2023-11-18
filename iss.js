@@ -13,7 +13,7 @@ const fetchMyIP = function (callback) {
 
     if (response && response.statusCode !== 200) {
       const msg = (`An error occured while retriving your IP address.`);
-      callback(`Status Code ${response.StatusCode}. Response: ${body}`, null);
+      callback(`Status Code ${response.statusCode}. Response: ${body}`, null);
       callback(Error(msg), null);
       return;
     }
