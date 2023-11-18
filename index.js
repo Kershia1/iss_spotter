@@ -59,3 +59,5 @@ The ISS will next pass above you at Sun Nov 19 2023 12:16:39 GMT+0000 (Coordinat
 The ISS will next pass above you at Sun Nov 19 2023 22:23:19 GMT+0000 (Coordinated Universal Time) for 672 seconds!
 The ISS will next pass above you at Mon Nov 20 2023 08:29:59 GMT+0000 (Coordinated Universal Time) for 144 seconds!
 The ISS will next pass above you at Mon Nov 20 2023 18:36:39 GMT+0000 (Coordinated Universal Time) for 233 seconds! */
+
+module.exports = { nextFlyOvers };
